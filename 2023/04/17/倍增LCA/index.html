@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>倍增LCA | 大黄的博客</title><meta name="author" content="黄和霖"><meta name="copyright" content="黄和霖"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前言:蓝桥杯前没有学到LCA，最后两题都用到了LCA。 无奈啊，今天补上这个 概述:LCA即在一棵树上，找到两个结点的最近祖先(祖先可能有多个)。 主要有两种算法解决，这里讲解一下倍增dp算法找到LCA。 其基本思想是通过预处理出每个节点距离2^k个祖先的信息，并利用这些信息在查询时快速跳转到两个节点的同一深度，然后再沿着祖先链进行比较，找到它们的LCA。 具体来说，倍增LCA算法分为两个步骤：预">
+<meta property="og:type" content="article">
+<meta property="og:title" content="倍增LCA">
+<meta property="og:url" content="http://bighuang.fun/2023/04/17/%E5%80%8D%E5%A2%9ELCA/index.html">
+<meta property="og:site_name" content="大黄的博客">
+<meta property="og:description" content="前言:蓝桥杯前没有学到LCA，最后两题都用到了LCA。 无奈啊，今天补上这个 概述:LCA即在一棵树上，找到两个结点的最近祖先(祖先可能有多个)。 主要有两种算法解决，这里讲解一下倍增dp算法找到LCA。 其基本思想是通过预处理出每个节点距离2^k个祖先的信息，并利用这些信息在查询时快速跳转到两个节点的同一深度，然后再沿着祖先链进行比较，找到它们的LCA。 具体来说，倍增LCA算法分为两个步骤：预">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-04-17T13:14:01.000Z">
+<meta property="article:modified_time" content="2023-04-18T01:37:50.697Z">
+<meta property="article:author" content="黄和霖">
+<meta property="article:tag" content="最近公共祖先">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://bighuang.fun/2023/04/17/%E5%80%8D%E5%A2%9ELCA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '倍增LCA',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-18 09:37:50'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="大黄的博客" type="application/atom+xml">
+</head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="大黄的博客"><span class="site-name">大黄的博客</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">倍增LCA</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-17T13:14:01.000Z" title="发表于 2023-04-17 21:14:01">2023-04-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-18T01:37:50.697Z" title="更新于 2023-04-18 09:37:50">2023-04-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%AE%97%E6%B3%95/">算法</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="倍增LCA"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="前言"><a href="#前言" class="headerlink" title="前言:"></a>前言:</h1><p><font face="正楷" size=4>蓝桥杯前没有学到LCA，最后两题都用到了LCA。</p>
+<p>无奈啊，今天补上这个</font></p>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述:"></a>概述:</h1><p><font face="正楷" size=4>LCA即在一棵树上，找到两个结点的最近祖先(祖先可能有多个)。</p>
+<p>主要有两种算法解决，这里讲解一下倍增dp算法找到LCA。</p>
+<p>其基本思想是通过预处理出每个节点距离2^k个祖先的信息，并利用这些信息在查询时快速跳转到两个节点的同一深度，然后再沿着祖先链进行比较，找到它们的LCA。</p>
+<p>具体来说，倍增LCA算法分为两个步骤：预处理和查询。预处理阶段需要对整棵树进行遍历，计算出每个节点距离2^k个祖先的距离信息。查询阶段则利用这些信息，在O(logn)的时间内找到两个节点的LCA。</p>
+<p>在预处理阶段，我们可以使用动态规划的方式，逐层计算出节点距离2^k个祖先的距离信息。具体来说，设f[i][j]表示节点i距离2^j个祖先的距离，那么有以下递推式：</font></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">f[i][0] = fa[i]</span><br><span class="line">f[i][j] = f[f[i][j-1]][j-1] + f[i][j-1]</span><br></pre></td></tr></table></figure>
+<p><font face="正楷" size=4>其中fa[i]表示节点i的父亲节点。可以看出，f[i][j]可以由f[i][j-1]和f[f[i][j-1]][j-1]计算得到。这也就是“倍增”的含义。通过这个递推式，我们可以在O(nlogn)的时间内预处理出所有节点距离2</font></p>
+<h2 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h2><p><font face="正楷" size=4>利用深搜处理这颗树，然后预处理每个节点的倍增数组</font></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void dfs(int u,int fa)&#123;</span><br><span class="line">    f[u][0]=fa,dep[u]=dep[fa]+1;</span><br><span class="line">    <span class="keyword">for</span>(int i=1;(1&lt;&lt;<span class="string">i)&lt;=dep[u];i</span>++)f[u][i]=f[[f[u][i-1]]][i-1];</span><br><span class="line">    <span class="keyword">for</span>(auto &amp;p:e[u])&#123;</span><br><span class="line">        <span class="keyword">if</span>(p!=fa)</span><br><span class="line">            dfs(p,u);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h2><p><font face="正楷" size=4>让深度大的结点向上跳跃(这里的跳跃是大跳跃)，直到同一深度。</p>
+<p>然后两者同时跳,直到跳到同一结点结束(注意该节点不是LCA，应该是该节点的上面的第一个祖先才是LCA)</font></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">int lca(int u,int v)&#123;</span><br><span class="line">    <span class="keyword">if</span>(dep[u]&lt;dep[v])swap(u,v);//挑选深度更大的结点先跳跃</span><br><span class="line">    <span class="keyword">for</span>(int i=20;i&gt;=0;i--)&#123;</span><br><span class="line">        <span class="keyword">if</span>(dep[f[u][i]]&gt;=dep[v])u=f[u][i];//判断是否同一深度</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(u==v)<span class="built_in">return</span> u;//如果用一深度</span><br><span class="line">    <span class="keyword">for</span>(int i=20;i&gt;=0;i--)&#123;</span><br><span class="line">        <span class="keyword">if</span>(f[u][i]!=f[v][i])u=f[u][i],v=f[v][i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> f[u][0];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="树上差分"><a href="#树上差分" class="headerlink" title="树上差分"></a>树上差分</h2><p><font face="正楷" size=4>讲完lca，这里补充一下树上差分。</p>
+<p>任意树上两个结点的距离会等于$distance=dist[u]+dist[v]-2*lca(u,v)</p>
+<p>即从根到u结点的距离+根到v结点的距离-2*根到二者lca的距离(画图秒懂)</font></p>
+<h1 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h1><p><font face="正楷" size=4>接下来直接上两道蓝桥杯真题，快速掌握lca以及树上差分</font></p>
+<h2 id="题目一：蓝桥杯2023年第十四届省赛真题-砍树"><a href="#题目一：蓝桥杯2023年第十四届省赛真题-砍树" class="headerlink" title="题目一：蓝桥杯2023年第十四届省赛真题-砍树"></a>题目一：<a target="_blank" rel="noopener" href="https://www.dotcpp.com/oj/problem3157.html">蓝桥杯2023年第十四届省赛真题-砍树</a></h2><p><font face="正楷" size=4>给定一棵由 n 个结点组成的树以及 m 个不重复的无序数对 (a1, b1), (a2, b2),. . . , (am, bm)，</p>
+<p>其中 ai 互不相同，bi 互不相同，ai ≠ bj(1 ≤ i, j ≤ m)。</p>
+<p>小明想知道是否能够选择一条树上的边砍断，使得对于每个 (ai , bi) 满足 ai和 bi 不连通，</p>
+<p>如果可以则输出应该断掉的边的编号（编号按输入顺序从 1 开始），否则输出 -1.(完整题目点题目就可以)</font></p>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现:"></a>代码实现:</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include&lt;bits/stdc++.h&gt;</span></span><br><span class="line">using namespace std;</span><br><span class="line">const int N=1e5+5;</span><br><span class="line">vector&lt;pair&lt;int,int&gt;&gt;e[N];</span><br><span class="line">int dep[N],f[N][20],s[N],n,m,ans=-1;</span><br><span class="line">void init(int u,int fa)&#123;</span><br><span class="line">    dep[u]=dep[fa]+1;f[u][0]=fa;</span><br><span class="line">    <span class="keyword">for</span>(int i=1;(1&lt;&lt;<span class="string">i)&lt;=dep[u];i</span>++)f[u][i]=f[f[u][i-1]][i-1];</span><br><span class="line">    <span class="keyword">for</span>(auto &amp;p:e[u])&#123;</span><br><span class="line">        <span class="keyword">if</span>(p.first!=fa)&#123;</span><br><span class="line">            init(p.first,u);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int lca(int u,int v)&#123;</span><br><span class="line">    <span class="keyword">if</span>(dep[u]&lt;dep[v])swap(u,v);</span><br><span class="line">    <span class="keyword">for</span>(int i=20;i&gt;=0;i--)</span><br><span class="line">        <span class="keyword">if</span>(dep[f[u][i]]&gt;=dep[v])u=f[u][i];</span><br><span class="line">    <span class="keyword">if</span>(u==v)<span class="built_in">return</span> u;</span><br><span class="line">    <span class="keyword">for</span>(int i=20;i&gt;=0;i--)</span><br><span class="line">        <span class="keyword">if</span>(f[u][i]!=f[v][i])</span><br><span class="line">            u=f[u][i],v=f[v][i];</span><br><span class="line">    <span class="built_in">return</span> f[u][0];</span><br><span class="line">&#125;</span><br><span class="line">void dfs(int u,int fa)&#123;</span><br><span class="line">    <span class="keyword">for</span>(auto &amp;p:e[u])&#123;</span><br><span class="line">        <span class="keyword">if</span> (p.first!=fa) &#123;</span><br><span class="line">            dfs(p.first, u);</span><br><span class="line">            s[u] += s[p.first];</span><br><span class="line">            <span class="keyword">if</span> (s[p.first] == m)</span><br><span class="line">                ans = max(ans, p.second);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int <span class="function"><span class="title">main</span></span>()&#123;</span><br><span class="line">    ios::sync_with_stdio(0),cin.tie(0);</span><br><span class="line">    cin&gt;&gt;n&gt;&gt;m;</span><br><span class="line">    <span class="keyword">for</span>(int i=1;i&lt;n;i++)&#123;</span><br><span class="line">        int u,v;cin&gt;&gt;u&gt;&gt;v;</span><br><span class="line">        e[u].push_back(&#123;v,i&#125;);</span><br><span class="line">        e[v].push_back(&#123;u,i&#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    init(1,0);</span><br><span class="line">    <span class="keyword">for</span>(int i=1;i&lt;=m;i++)&#123;</span><br><span class="line">        int u,v;cin&gt;&gt;u&gt;&gt;v;</span><br><span class="line">        s[u]+=1;s[v]+=1;s[lca(u,v)]-=2;</span><br><span class="line">    &#125;</span><br><span class="line">    dfs(1,0);</span><br><span class="line">    cout&lt;&lt;<span class="string">ans;</span></span><br><span class="line"><span class="string">    return 0;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="题目二-蓝桥杯2023年第十四届省赛真题-景区导游"><a href="#题目二-蓝桥杯2023年第十四届省赛真题-景区导游" class="headerlink" title="题目二:蓝桥杯2023年第十四届省赛真题-景区导游"></a>题目二:<a target="_blank" rel="noopener" href="https://www.dotcpp.com/oj/problem3156.html">蓝桥杯2023年第十四届省赛真题-景区导游</a></h2><p><font face="正楷" size=4>某景区一共有 N 个景点，编号 1 到 N。景点之间共有 N − 1 条双向的摆渡车线路相连，形成一棵树状结构。在景点之间往返只能通过这些摆渡车进行，需要花费一定的时间。<br>小明是这个景区的资深导游，他每天都要按固定顺序带客人游览其中 K 个景点：A1, A2, . . . , AK。今天由于时间原因，小明决定跳过其中一个景点，只带游客按顺序游览其中 K − 1 个景点。具体来说，如果小明选择跳过 Ai，那么他会按顺序带游客游览 A1, A2, . . . , Ai−1, Ai+1, . . . , AK, (1 ≤ i ≤ K)。<br>请你对任意一个 Ai，计算如果跳过这个景点，小明需要花费多少时间在景点之间的摆渡车上？(具体见题目)</font></p>
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现:"></a>代码实现:</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include&lt;bits/stdc++.h&gt;</span></span><br><span class="line">using namespace std;</span><br><span class="line">typedef long long ll;</span><br><span class="line">const int N=1e5+5;</span><br><span class="line">vector&lt;pair&lt;int,int&gt;&gt;e[N];</span><br><span class="line">ll dep[N],f[N][21];</span><br><span class="line">ll dist[N];</span><br><span class="line"></span><br><span class="line">void dfs(int u,int fa,ll d)&#123;</span><br><span class="line">    dep[u]=dep[fa]+1,f[u][0]=fa,dist[u]=d;</span><br><span class="line">    <span class="keyword">for</span>(int i=1;(1&lt;&lt;<span class="string">i)&lt;=dep[u];i</span>++)f[u][i]=f[f[u][i-1]][i-1];</span><br><span class="line">    <span class="keyword">for</span>(auto &amp;p:e[u])</span><br><span class="line">        <span class="keyword">if</span>(p.first!=fa)</span><br><span class="line">            dfs(p.first,u,d+p.second);</span><br><span class="line">&#125;</span><br><span class="line">int lca(int u,int v)&#123;</span><br><span class="line">    <span class="keyword">if</span>(dep[u]&lt;dep[v])swap(u,v);</span><br><span class="line">    <span class="keyword">for</span>(int i=20;i&gt;=0;i--)</span><br><span class="line">        <span class="keyword">if</span>(dep[f[u][i]]&gt;=dep[v])u=f[u][i];</span><br><span class="line">    <span class="keyword">if</span>(u==v)<span class="built_in">return</span> u;</span><br><span class="line">    <span class="keyword">for</span>(int i=20;i&gt;=0;i--)</span><br><span class="line">        <span class="keyword">if</span>(f[u][i]!=f[v][i])u=f[u][i],v=f[v][i];</span><br><span class="line">    <span class="built_in">return</span> f[u][0];</span><br><span class="line">&#125;</span><br><span class="line">ll get(int u,int v)&#123;</span><br><span class="line">    <span class="built_in">return</span> dist[u]+dist[v]-2*dist[lca(u,v)];</span><br><span class="line">&#125;</span><br><span class="line">int <span class="function"><span class="title">main</span></span>()&#123;</span><br><span class="line">    int n,k;cin&gt;&gt;n&gt;&gt;k;</span><br><span class="line">    <span class="keyword">for</span>(int i=1;i&lt;n;i++)&#123;</span><br><span class="line">        int u,v,t;cin&gt;&gt;u&gt;&gt;v&gt;&gt;t;</span><br><span class="line">        e[u].push_back(&#123;v,t&#125;);</span><br><span class="line">        e[v].push_back(&#123;u,t&#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    vector&lt;int&gt;a(k);</span><br><span class="line">    <span class="keyword">for</span>(auto&amp;p:a)cin&gt;&gt;p;</span><br><span class="line">    dfs(1,0,0);</span><br><span class="line">    ll <span class="built_in">sum</span>=0;</span><br><span class="line">    <span class="keyword">for</span>(int i=1;i&lt;k;i++)<span class="built_in">sum</span>+=get(a[i-1],a[i]);</span><br><span class="line">    <span class="keyword">for</span>(int i=0;i&lt;k;i++)&#123;</span><br><span class="line">        ll ans=<span class="built_in">sum</span>;</span><br><span class="line">        <span class="keyword">if</span>(i!=0)ans-=(get(a[i],a[i-1]));</span><br><span class="line">        <span class="keyword">if</span>(i!=k-1)ans-=(get(a[i],a[i+1]));</span><br><span class="line">        <span class="keyword">if</span>(i!=0&amp;&amp;i!=k-1)ans+=get(a[i-1],a[i+1]);</span><br><span class="line">        cout&lt;&lt;<span class="string">ans&lt;&lt;&quot; &quot;;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    return 0;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://bighuang.fun">黄和霖</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://bighuang.fun/2023/04/17/%E5%80%8D%E5%A2%9ELCA/">http://bighuang.fun/2023/04/17/%E5%80%8D%E5%A2%9ELCA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://bighuang.fun" target="_blank">大黄的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88/">最近公共祖先</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/20/%E5%8D%95%E8%B0%83%E6%A0%88/" title="单调栈"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">单调栈</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/04/%E7%BA%BF%E6%AE%B5%E6%A0%91/" title="线段树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">线段树</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">黄和霖</div><div class="author-info__description">不会抽烟，不会喝酒，唯有以乐消愁</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">2.</span> <span class="toc-text">概述:</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="toc-number">2.1.</span> <span class="toc-text">预处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2"><span class="toc-number">2.2.</span> <span class="toc-text">查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%91%E4%B8%8A%E5%B7%AE%E5%88%86"><span class="toc-number">2.3.</span> <span class="toc-text">树上差分</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E6%88%98"><span class="toc-number">3.</span> <span class="toc-text">实战</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E4%B8%80%EF%BC%9A%E8%93%9D%E6%A1%A5%E6%9D%AF2023%E5%B9%B4%E7%AC%AC%E5%8D%81%E5%9B%9B%E5%B1%8A%E7%9C%81%E8%B5%9B%E7%9C%9F%E9%A2%98-%E7%A0%8D%E6%A0%91"><span class="toc-number">3.1.</span> <span class="toc-text">题目一：蓝桥杯2023年第十四届省赛真题-砍树</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.1.1.</span> <span class="toc-text">代码实现:</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E4%BA%8C-%E8%93%9D%E6%A1%A5%E6%9D%AF2023%E5%B9%B4%E7%AC%AC%E5%8D%81%E5%9B%9B%E5%B1%8A%E7%9C%81%E8%B5%9B%E7%9C%9F%E9%A2%98-%E6%99%AF%E5%8C%BA%E5%AF%BC%E6%B8%B8"><span class="toc-number">3.2.</span> <span class="toc-text">题目二:蓝桥杯2023年第十四届省赛真题-景区导游</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">代码实现:</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/22/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/" title="二分查找">二分查找</a><time datetime="2023-04-22T13:58:23.000Z" title="发表于 2023-04-22 21:58:23">2023-04-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/21/C/" title="Educational Codeforces Round 147 (Rated for Div. 2) A - C">Educational Codeforces Round 147 (Rated for Div. 2) A - C</a><time datetime="2023-04-21T13:52:01.000Z" title="发表于 2023-04-21 21:52:01">2023-04-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/20/%E5%8D%95%E8%B0%83%E6%A0%88/" title="单调栈">单调栈</a><time datetime="2023-04-20T10:45:33.000Z" title="发表于 2023-04-20 18:45:33">2023-04-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/17/%E5%80%8D%E5%A2%9ELCA/" title="倍增LCA">倍增LCA</a><time datetime="2023-04-17T13:14:01.000Z" title="发表于 2023-04-17 21:14:01">2023-04-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/04/%E7%BA%BF%E6%AE%B5%E6%A0%91/" title="线段树">线段树</a><time datetime="2023-04-04T11:30:38.000Z" title="发表于 2023-04-04 19:30:38">2023-04-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By 黄和霖</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
